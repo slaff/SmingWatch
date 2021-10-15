@@ -1,10 +1,12 @@
 #include <SmingCore.h>
-#include <axp20x.h>
+#include "hardware.h"
 
 namespace
 {
+
 } // namespace
 
 void init()
 {
+	initPower();
 }
