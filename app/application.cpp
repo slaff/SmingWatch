@@ -5,8 +5,6 @@
 
 namespace
 {
-
-
 void onGuiReady(Graphics::Object* object)
 {
 	// TODO: add here the rest...

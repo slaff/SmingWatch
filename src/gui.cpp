@@ -7,7 +7,6 @@ using namespace Graphics;
 
 namespace
 {
-
 RenderQueue* renderQueue;
 AbstractDisplay* display;
 
@@ -60,7 +59,7 @@ void render(RenderQueue::Completed callback)
 	renderQueue->render(scene, callback);
 }
 
-} // namespace gui
+} // namespace
 
 void initGui(RenderQueue::Completed callback)
 {
