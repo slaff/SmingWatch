@@ -3,6 +3,8 @@
 #include <Graphics/Object.h>
 #include <Graphics/AbstractDisplay.h>
 
-bool initDisplay();
+using DisplayCallback = Delegate<void(Graphics::AbstractDisplay&)>;
+
+bool initDisplay(DisplayCallback onDisplay);
 
 Graphics::AbstractDisplay* getDisplay();

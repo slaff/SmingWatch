@@ -8,20 +8,15 @@ using namespace Graphics;
 namespace
 {
 RenderQueue* renderQueue;
-AbstractDisplay* display;
 
 constexpr Orientation portrait{Orientation::deg180};
 constexpr Orientation landscape{Orientation::deg270};
 
-void render(RenderQueue::Completed callback)
+void render(Graphics::AbstractDisplay& display, RenderQueue::Completed callback)
 {
-	if(display == nullptr) {
-		return;
-	}
+	display.setOrientation(portrait);
 
-	display->setOrientation(portrait);
-
-	auto size = display->getSize();
+	auto size = display.getSize();
 	auto scene = new SceneObject(size, F("Color Tests"));
 	scene->clear();
 
@@ -53,7 +48,7 @@ void render(RenderQueue::Completed callback)
 	text.commit(*scene);
 
 	if(renderQueue == nullptr) {
-		renderQueue = new RenderQueue(*display);
+		renderQueue = new RenderQueue(display);
 	}
 
 	renderQueue->render(scene, callback);
@@ -61,9 +56,7 @@ void render(RenderQueue::Completed callback)
 
 } // namespace
 
-void initGui(RenderQueue::Completed callback)
+void initGui(Graphics::AbstractDisplay& display, RenderQueue::Completed callback)
 {
-	display = getDisplay();
-
-	render(callback);
+	render(display, callback);
 }

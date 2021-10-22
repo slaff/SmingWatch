@@ -30,7 +30,7 @@ Graphics::Display::ST7789V tft(spi, {240, 240});
 
 } // namespace
 
-bool initDisplay()
+bool initDisplay(DisplayCallback onDisplay)
 {
 #ifdef ENABLE_VIRTUAL_SCREEN
 	if(!tft.begin()) {
@@ -63,6 +63,8 @@ bool initDisplay()
 		pinMode(TFT_BL_PIN, OUTPUT);
 		digitalWrite(TFT_BL_PIN, HIGH);
 	}
+
+	onDisplay(tft);
 
 	return true;
 #endif

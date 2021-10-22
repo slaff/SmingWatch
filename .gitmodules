@@ -1,3 +1,16 @@
 [submodule "Libraries.AXP202X"]
-	path = Libraries/AXP202X
+	path = libs/AXP202X
 	url = https://github.com/lewisxhe/AXP202X_Library.git
+	ignore = dirty	
+[submodule "Libraries.BMA423"]
+	path = libs/BMA423
+	url = https://github.com/lewisxhe/BMA423_Library.git
+	ignore = dirty	
+[submodule "Libraries.PCF8563"]
+	path = libs/PCF8563
+	url = https://github.com/lewisxhe/PCF8563_Library.git
+	ignore = dirty	
+[submodule "Libraries/FocalTech"]
+	path = libs/FocalTech
+	url = https://github.com/lewisxhe/FocalTech_Library.git
+	ignore = dirty	

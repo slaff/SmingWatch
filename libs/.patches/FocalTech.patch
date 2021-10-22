@@ -1,0 +1,30 @@
+diff --git a/src/focaltech.cpp b/src/focaltech.cpp
+index 53e61a0..dd3c450 100644
+--- a/src/focaltech.cpp
++++ b/src/focaltech.cpp
+@@ -29,6 +29,7 @@ github:https://github.com/lewisxhe/FocalTech_Library
+ /////////////////////////////////////////////////////////////////
+ #include "focaltech.h"
+ 
++#define OPEN_DRAIN        0x10
+ 
+ #define FT5206_VENDID                   (0x11)
+ #define FT6206_CHIPID                   (0x06)
+@@ -394,7 +395,7 @@ bool GT9xx_Class::probe(void)
+     buffer[3] = readRegister(GT9XX_CONFIG_VERSION);
+     Serial.printf("TouchPad_ID:%c,%c,%c\r\nTouchPad_Config_Version:%2x\r\n", buffer[0], buffer[1], buffer[2], buffer[3]);
+     uint8_t check_sum = 0;
+-    for (int i = 0; i < (sizeof(config0) - 2); i++) {
++    for (unsigned i = 0; i < (sizeof(config0) - 2); i++) {
+         check_sum += config0[i];
+     }
+     config0[184] = (~check_sum) + 1;
+@@ -425,7 +426,7 @@ bool GT9xx_Class::readBytes( uint16_t reg, uint8_t *data, int nbytes)
+     _i2cPort->write(reg >> 8);
+     _i2cPort->write(reg & 0xFF);
+     _i2cPort->endTransmission();
+-    _i2cPort->requestFrom(_address, nbytes);
++    _i2cPort->requestFrom(static_cast<int>(_address), nbytes);
+     int index = 0;
+     while (_i2cPort->available())
+         data[index++] = _i2cPort->read();

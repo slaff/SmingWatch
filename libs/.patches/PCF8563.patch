@@ -1,0 +1,13 @@
+diff --git a/src/pcf8563.h b/src/pcf8563.h
+index 57586be..407998d 100644
+--- a/src/pcf8563.h
++++ b/src/pcf8563.h
+@@ -193,7 +193,7 @@ private:
+ 
+         //Adapt to HYM8563, no stop bit is sent after reading the sending register address
+         _i2cPort->endTransmission(false);
+-        _i2cPort->requestFrom(_address, nbytes, true);  //HYM8563 send stopbit
++        _i2cPort->requestFrom(_address, static_cast<size_t>(nbytes), true);  //HYM8563 send stopbit
+ 
+         uint8_t index = 0;
+         while (_i2cPort->available())
