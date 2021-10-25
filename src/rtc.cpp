@@ -7,10 +7,10 @@ RealTimeClock* rtc = nullptr;
 
 } // namespace
 
-bool initRtc(RealTimeClockCallback callback)
+RealTimeClock* initRtc(WatchState& watchState)
 {
 	if(rtc != nullptr) {
-		return false;
+		return rtc;
 	}
 
 	rtc = new RealTimeClock();
@@ -18,14 +18,15 @@ bool initRtc(RealTimeClockCallback callback)
 		debug_e("Failed initializing the real time clock!");
 		delete rtc;
 		rtc = nullptr;
-		return false;
 	}
 
-	if(callback != nullptr) {
-		callback(*rtc);
-	}
+	pinMode(RTC_INT_PIN, INPUT_PULLUP);
+	attachInterrupt(
+		RTC_INT_PIN, [&watchState] { watchState.rtcIrq = true; }, FALLING);
 
-	return true;
+	rtc->disableAlarm();
+
+	return rtc;
 }
 
 RealTimeClock& getRtc()

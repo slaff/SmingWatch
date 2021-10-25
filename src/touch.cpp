@@ -8,10 +8,10 @@ TwoWire Wire1;
 
 } // namespace
 
-bool initTouch(TouchInterruptHandler touchHandler)
+CapacitiveTouch* initTouch(WatchState& watchState)
 {
 	if(touch != nullptr) {
-		return false;
+		return touch;
 	}
 
 #if defined(TOUCH_RST)
@@ -27,7 +27,7 @@ bool initTouch(TouchInterruptHandler touchHandler)
 		debug_e("Begin touch FAIL");
 		delete touch;
 		touch = nullptr;
-		return false;
+		return touch;
 	}
 
 	touch->enableINT();
@@ -48,9 +48,9 @@ bool initTouch(TouchInterruptHandler touchHandler)
 	 */
 	pinMode(TOUCH_INT_PIN, INPUT);
 	attachInterrupt(
-		TOUCH_INT_PIN, [touchHandler]() { touchHandler(*touch); }, FALLING);
+		TOUCH_INT_PIN, [&watchState]() { watchState.touchIrq = true; }, FALLING);
 
-	return true;
+	return touch;
 }
 
 CapacitiveTouch& getTouch()

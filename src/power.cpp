@@ -7,10 +7,10 @@ Power* power;
 
 } // namespace
 
-bool initPower(PowerCallback callback)
+Power* initPower(WatchState& watchState)
 {
 	if(power != nullptr) {
-		return false;
+		return power;
 	}
 
 	power = new Power();
@@ -19,7 +19,7 @@ bool initPower(PowerCallback callback)
 		debug_e("AXP Power begin failed");
 		delete power;
 		power = nullptr;
-		return false;
+		return power;
 	}
 
 	//Change the shutdown time to 4 seconds
@@ -37,9 +37,12 @@ bool initPower(PowerCallback callback)
 	//is shared with the backlight, so LDO2 cannot be turned off
 	power->setPowerOutPut(AXP202_LDO2, AXP202_ON);
 
-	if(callback) {
-		callback(*power);
-	}
+	attachInterrupt(
+		POWER_INT_PIN, [&watchState] { watchState.powerIrq = true; }, FALLING);
 
-	return true;
+	power->enableIRQ(
+		AXP202_PEK_SHORTPRESS_IRQ | AXP202_VBUS_REMOVED_IRQ | AXP202_VBUS_CONNECT_IRQ | AXP202_CHARGING_IRQ, true);
+	power->clearIRQ();
+
+	return power;
 }

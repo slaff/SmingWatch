@@ -32,10 +32,10 @@ uint16_t writeRegister(uint8_t address, uint8_t reg, uint8_t* data, uint16_t len
 
 } // namespace
 
-bool initAxis(AxisInterruptHandler axisHandler)
+AxisSensor* initAxis(WatchState& watchState)
 {
 	if(axis != nullptr) {
-		return false;
+		return axis;
 	}
 
 	axis = new AxisSensor();
@@ -43,7 +43,7 @@ bool initAxis(AxisInterruptHandler axisHandler)
 		debug_e("BMA423 was not found. Please check wiring/power. ");
 		delete axis;
 		axis = nullptr;
-		return false;
+		return axis;
 	}
 
 	bma423_axes_remap remap_data;
@@ -118,7 +118,7 @@ bool initAxis(AxisInterruptHandler axisHandler)
 
 	pinMode(AXIS_INT_PIN, INPUT);
 	attachInterrupt(
-		AXIS_INT_PIN, [axisHandler]() { axisHandler(*axis); }, RISING);
+		AXIS_INT_PIN, [&watchState]() { watchState.axisIrq = true; }, RISING);
 
 	// Enable BMA423 isStepCounter feature
 	axis->enableFeature(BMA423_STEP_CNTR, true);
@@ -136,7 +136,7 @@ bool initAxis(AxisInterruptHandler axisHandler)
 	// It corresponds to isDoubleClick interrupt
 	axis->enableWakeupInterrupt();
 
-	return true;
+	return axis;
 }
 
 AxisSensor& getAxis()

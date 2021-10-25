@@ -2,10 +2,11 @@
 
 #include <focaltech.h>
 #include <Delegate.h>
+#include "watch.h"
 
 using CapacitiveTouch = FocalTech_Class;
 using TouchInterruptHandler = Delegate<void(CapacitiveTouch&)>;
 
-bool initTouch(TouchInterruptHandler handler);
+CapacitiveTouch* initTouch(WatchState& watchState);
 
 CapacitiveTouch& getTouch();
