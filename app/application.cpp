@@ -9,6 +9,7 @@
 namespace
 {
 bool backLightState = false;
+Timer mainTimer;
 
 void onGuiReady(Graphics::Object* object)
 {
@@ -62,6 +63,10 @@ void onRtcReady(RealTimeClock& rtc)
 	debug_d("RTC ready! Timer is: %s", (rtc.isTimerActive() ? "active" : "inactive"));
 }
 
+void loop()
+{
+}
+
 void initHardware()
 {
 	Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN); // this is the main I2S bus
@@ -71,6 +76,8 @@ void initHardware()
 	initTouch(onTouch);
 	initAxis(onAxis);
 	initDisplay([](Graphics::AbstractDisplay& display) { initGui(display, onGuiReady); });
+
+	mainTimer.initializeMs(10, loop).start();
 }
 
 } // namespace
