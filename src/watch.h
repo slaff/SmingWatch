@@ -9,14 +9,6 @@ struct WatchState {
 	bool powerIrq;
 	bool rtcIrq;
 	uint32_t keyPress;
+	uint16_t touchX;
+	uint16_t touchY;
 };
-
-#ifdef INPUT_PULLUP
-#undef INPUT_PULLUP
-#define INPUT_PULLUP 0x05
-#endif
-
-#ifdef RISING
-#undef RISING
-#define RISING 0x01
-#endif

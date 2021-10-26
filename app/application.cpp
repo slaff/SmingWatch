@@ -51,6 +51,8 @@ void onPower(Power& power)
 
 void onRtc(RealTimeClock& rtc)
 {
+	// TODO: emit EVENT_CLOCK
+	debug_d("Got RTC alarm.");
 }
 
 void onTouch(CapacitiveTouch& touch)
@@ -59,6 +61,9 @@ void onTouch(CapacitiveTouch& touch)
 	digitalWrite(BACKLIGHT_PIN, watchState.backLight);
 	watchState.backLight = !watchState.backLight;
 
+	touch.getPoint(watchState.touchX, watchState.touchY);
+
+	debug_d("X: %d, Y: %d", watchState.touchX, watchState.touchY);
 	// TODO: emit EVENT_BACKLIGHT
 }
 
@@ -127,6 +132,15 @@ void initHardware()
 		debug_e("ERROR: Unable to initialize Real Time Clock.");
 		return;
 	}
+
+	// TEST RTC alarms
+	watch.rtc->disableAlarm();
+
+	// watch.rtc->setDateTime(2019, 8, 12, 15, 0, 53);
+
+	watch.rtc->setAlarmByMinutes(1);
+
+	watch.rtc->enableAlarm();
 
 	watch.touch = initTouch(watchState);
 	watch.axis = initAxis(watchState);
