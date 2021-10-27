@@ -2,11 +2,17 @@
 
 #include <bma.h>
 #include <Delegate.h>
-#include "watch.h"
 
-using AxisSensor = BMA423;
-using AxisInterruptHandler = Delegate<void(AxisSensor&)>;
+class AxisSensor : public BMA423
+{
+public:
+	using Callback = Delegate<void(AxisSensor& axis)>;
 
-AxisSensor* initAxis(WatchState& watchState);
+	bool begin(Callback callback);
 
-AxisSensor& getAxis();
+private:
+	static void interruptHandler();
+
+	static AxisSensor* sensor;
+	static Callback callback;
+};

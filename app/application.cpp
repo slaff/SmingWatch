@@ -13,11 +13,13 @@ Timer mainTimer;
 bool isReady = true;
 WatchState watchState;
 
-struct Watch {
+class Watch
+{
+public:
 	Power* power;
 	RealTimeClock* rtc;
 	CapacitiveTouch* touch;
-	AxisSensor* axis;
+	AxisSensor axis;
 };
 
 Watch watch;
@@ -103,12 +105,6 @@ void loop()
 		watchState.rtcIrq = false;
 	}
 
-	// Monitoring Axis/Acceleromater Sensor
-	if(watch.axis && watchState.axisIrq) {
-		onAxis(*watch.axis);
-		watchState.axisIrq = false;
-	}
-
 	// Touch sensor
 	if(watch.touch && watchState.touchIrq) {
 		onTouch(*watch.touch);
@@ -143,7 +139,7 @@ void initHardware()
 	watch.rtc->enableAlarm();
 
 	watch.touch = initTouch(watchState);
-	watch.axis = initAxis(watchState);
+	watch.axis.begin(onAxis);
 
 	initDisplay([](Graphics::AbstractDisplay& display) { initGui(display, onGuiReady); });
 

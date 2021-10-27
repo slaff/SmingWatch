@@ -4,7 +4,6 @@
 
 struct WatchState {
 	bool backLight;
-	bool axisIrq;
 	bool touchIrq;
 	bool powerIrq;
 	bool rtcIrq;
