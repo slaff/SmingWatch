@@ -13,10 +13,13 @@ uint16_t readRegister(uint8_t address, uint8_t reg, uint8_t* data, uint16_t len)
 {
 	Wire.beginTransmission(address);
 	Wire.write(reg);
-	Wire.endTransmission();
-	Wire.requestFrom((uint8_t)address, (uint8_t)len);
+	Wire.endTransmission(false);
+	Wire.requestFrom(address, uint8_t(len), uint8_t(true));
 	uint8_t i = 0;
 	while(Wire.available()) {
+		if(i >= len) {
+			return 1 << 14;
+		}
 		data[i++] = Wire.read();
 	}
 	return 0; //Pass
@@ -27,7 +30,8 @@ uint16_t writeRegister(uint8_t address, uint8_t reg, uint8_t* data, uint16_t len
 	Wire.beginTransmission(address);
 	Wire.write(reg);
 	Wire.write(data, len);
-	return (0 != Wire.endTransmission());
+	auto ret = Wire.endTransmission();
+	return ret ? 1 << 12 : ret;
 }
 
 } // namespace

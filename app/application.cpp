@@ -53,6 +53,7 @@ void onRtc(RealTimeClock& rtc)
 {
 	// TODO: emit EVENT_CLOCK
 	debug_d("Got RTC alarm.");
+	watch.rtc->resetAlarm();
 }
 
 void onTouch(CapacitiveTouch& touch)
@@ -119,7 +120,7 @@ void loop()
 
 void initHardware()
 {
-	Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN); // this is the main I2S bus
+	Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN); // this is the main I2C bus
 
 	watch.power = initPower(watchState);
 	if(!watch.power) {
@@ -136,9 +137,8 @@ void initHardware()
 	// TEST RTC alarms
 	watch.rtc->disableAlarm();
 
-	// watch.rtc->setDateTime(2019, 8, 12, 15, 0, 53);
-
-	watch.rtc->setAlarmByMinutes(1);
+	watch.rtc->setDateTime(2021, 10, 26, 19, 20, 00);
+	watch.rtc->setAlarmByMinutes(21);
 
 	watch.rtc->enableAlarm();
 
