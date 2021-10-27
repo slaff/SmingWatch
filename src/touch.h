@@ -4,9 +4,17 @@
 #include <Delegate.h>
 #include "watch.h"
 
-using CapacitiveTouch = FocalTech_Class;
-using TouchInterruptHandler = Delegate<void(CapacitiveTouch&)>;
+class CapacitiveTouch : public FocalTech_Class
+{
+public:
+	using InterruptCallback = Delegate<void(CapacitiveTouch&)>;
 
-CapacitiveTouch* initTouch(WatchState& watchState);
+	bool begin(InterruptCallback callback);
 
-CapacitiveTouch& getTouch();
+private:
+	static void interruptHandler();
+
+	static CapacitiveTouch* touch;
+	static InterruptCallback callback;
+	static TwoWire Wire1;
+};

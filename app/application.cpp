@@ -18,7 +18,7 @@ class Watch
 public:
 	Power power;
 	RealTimeClock rtc;
-	CapacitiveTouch* touch;
+	CapacitiveTouch touch;
 	AxisSensor axis;
 };
 
@@ -93,12 +93,6 @@ void loop()
 
 	isReady = false;
 
-	// Touch sensor
-	if(watch.touch && watchState.touchIrq) {
-		onTouch(*watch.touch);
-		watchState.touchIrq = false;
-	}
-
 	isReady = true;
 }
 
@@ -122,7 +116,7 @@ void initHardware()
 
 	watch.rtc.enableAlarm();
 
-	watch.touch = initTouch(watchState);
+	watch.touch.begin(onTouch);
 	watch.axis.begin(onAxis);
 
 	initDisplay([](Graphics::AbstractDisplay& display) { initGui(display, onGuiReady); });
