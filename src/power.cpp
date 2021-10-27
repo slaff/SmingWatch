@@ -1,4 +1,5 @@
 #include "power.h"
+#include "config.h"
 #include <Wire.h>
 
 bool Power::begin(Callback callback)

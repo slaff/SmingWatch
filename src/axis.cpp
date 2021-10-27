@@ -1,5 +1,5 @@
 #include "axis.h"
-#include <Digital.h>
+#include "config.h"
 #include <Platform/System.h>
 
 namespace

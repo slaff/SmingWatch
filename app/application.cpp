@@ -1,11 +1,11 @@
 #include <SmingCore.h>
-#include "watch.h"
-#include "power.h"
-#include "rtc.h"
-#include "axis.h"
-#include "touch.h"
-#include "display.h"
-#include "gui.h"
+#include <watch.h>
+#include <power.h>
+#include <rtc.h>
+#include <axis.h>
+#include <touch.h>
+#include <display.h>
+#include <gui.h>
 
 namespace
 {

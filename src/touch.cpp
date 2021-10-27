@@ -1,4 +1,5 @@
 #include "touch.h"
+#include "config.h"
 #include <Digital.h>
 
 TwoWire CapacitiveTouch::Wire1;

@@ -1,4 +1,5 @@
 #include "rtc.h"
+#include "config.h"
 #include <Wire.h>
 
 bool RealTimeClock ::begin(Callback callback)
