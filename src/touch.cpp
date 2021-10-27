@@ -1,13 +1,11 @@
 #include "touch.h"
 #include <Digital.h>
 
-CapacitiveTouch* CapacitiveTouch::touch;
-CapacitiveTouch::InterruptCallback CapacitiveTouch::callback;
 TwoWire CapacitiveTouch::Wire1;
 
-bool CapacitiveTouch::begin(InterruptCallback callback)
+bool CapacitiveTouch::begin(Callback callback)
 {
-	if(touch != nullptr) {
+	if(class_ != nullptr) {
 		return false;
 	}
 
@@ -23,9 +21,6 @@ bool CapacitiveTouch::begin(InterruptCallback callback)
 		debug_e("[TOUCH] begin FAIL");
 		return false;
 	}
-
-	touch = this;
-	this->callback = callback;
 
 	enableINT();
 	/*
@@ -43,15 +38,7 @@ bool CapacitiveTouch::begin(InterruptCallback callback)
 	/*
 	 Interrupt polling is only compatible with 2020-V1, 2020-V2, others are not currently adapted
 	 */
-	pinMode(TOUCH_INT_PIN, INPUT);
-	attachInterrupt(TOUCH_INT_PIN, interruptHandler, FALLING);
+	attachInterrupt(callback, TOUCH_INT_PIN);
 
 	return true;
-}
-
-void IRAM_ATTR CapacitiveTouch::interruptHandler()
-{
-	if(callback != nullptr) {
-		System.queueCallback([](void*) { callback(*touch); });
-	}
 }

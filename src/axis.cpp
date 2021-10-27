@@ -2,9 +2,6 @@
 #include <Digital.h>
 #include <Platform/System.h>
 
-AxisSensor* AxisSensor::sensor;
-AxisSensor::Callback AxisSensor::callback;
-
 namespace
 {
 //
@@ -40,7 +37,7 @@ uint16_t writeRegister(uint8_t address, uint8_t reg, uint8_t* data, uint16_t len
 
 bool AxisSensor::begin(Callback callback)
 {
-	if(sensor != nullptr) {
+	if(class_ != nullptr) {
 		debug_e("[AXIS] Already initialised");
 		return false;
 	}
@@ -49,9 +46,6 @@ bool AxisSensor::begin(Callback callback)
 		debug_e("BMA423 was not found. Please check wiring/power. ");
 		return false;
 	}
-
-	sensor = this;
-	this->callback = callback;
 
 	bma423_axes_remap remap_data = {
 		.x_axis = 0,
@@ -85,8 +79,7 @@ bool AxisSensor::begin(Callback callback)
 	};
 	setINTPinConfig(config, BMA4_INTR1_MAP);
 
-	pinMode(AXIS_INT_PIN, INPUT);
-	attachInterrupt(AXIS_INT_PIN, interruptHandler, RISING);
+	attachInterrupt(callback, AXIS_INT_PIN, RISING);
 
 	// Enable BMA423 isStepCounter feature
 	enableFeature(BMA423_STEP_CNTR, true);
@@ -105,11 +98,4 @@ bool AxisSensor::begin(Callback callback)
 	enableWakeupInterrupt();
 
 	return true;
-}
-
-void IRAM_ATTR AxisSensor::interruptHandler()
-{
-	if(callback != nullptr) {
-		System.queueCallback(InterruptCallback([]() { callback(*sensor); }));
-	}
 }
