@@ -2,9 +2,17 @@
 
 #include <axp20x.h>
 #include <Delegate.h>
-#include "watch.h"
 
-using Power = AXP20X_Class;
-using PowerCallback = Delegate<void(Power&)>;
+class Power : public AXP20X_Class
+{
+public:
+	using Callback = Delegate<void(Power&)>;
 
-Power* initPower(WatchState& watchState);
+	bool begin(Callback callback);
+
+private:
+	static void interruptHandler();
+
+	static Power* power;
+	static Callback callback;
+};

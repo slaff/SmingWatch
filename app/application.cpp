@@ -16,7 +16,7 @@ WatchState watchState;
 class Watch
 {
 public:
-	Power* power;
+	Power power;
 	RealTimeClock* rtc;
 	CapacitiveTouch* touch;
 	AxisSensor axis;
@@ -93,12 +93,6 @@ void loop()
 
 	isReady = false;
 
-	// Power
-	if(watchState.powerIrq) {
-		onPower(*watch.power);
-		watchState.powerIrq = false;
-	}
-
 	// Real Time Clock
 	if(watchState.rtcIrq) {
 		onRtc(*watch.rtc);
@@ -118,9 +112,7 @@ void initHardware()
 {
 	Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN); // this is the main I2C bus
 
-	watch.power = initPower(watchState);
-	if(!watch.power) {
-		debug_e("ERROR: Unable to initialize power system.");
+	if(!watch.power.begin(onPower)) {
 		return;
 	}
 
