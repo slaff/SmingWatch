@@ -5,6 +5,7 @@
 #include <axis.h>
 #include <touch.h>
 #include <display.h>
+#include <backlight.h>
 #include <gui.h>
 
 namespace
@@ -20,6 +21,7 @@ public:
 	RealTimeClock rtc;
 	CapacitiveTouch touch;
 	AxisSensor axis;
+	BackLight backlight;
 };
 
 Watch watch;
@@ -61,8 +63,7 @@ void onRtc(RealTimeClock& rtc)
 void onTouch(CapacitiveTouch& touch)
 {
 	debug_d("Touched!");
-	digitalWrite(BACKLIGHT_PIN, watchState.backLight);
-	watchState.backLight = !watchState.backLight;
+	watch.backlight.reverse();
 
 	touch.getPoint(watchState.touchX, watchState.touchY);
 
@@ -118,6 +119,8 @@ void initHardware()
 
 	watch.touch.begin(onTouch);
 	watch.axis.begin(onAxis);
+	watch.backlight.begin();
+	watch.backlight.adjust(10);
 
 	initDisplay([](Graphics::AbstractDisplay& display) { initGui(display, onGuiReady); });
 
