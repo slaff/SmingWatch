@@ -5,7 +5,6 @@
 struct WatchState {
 	bool backLight;
 	bool touchIrq;
-	bool rtcIrq;
 	uint32_t keyPress;
 	uint16_t touchX;
 	uint16_t touchY;

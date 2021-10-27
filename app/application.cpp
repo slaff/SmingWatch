@@ -17,7 +17,7 @@ class Watch
 {
 public:
 	Power power;
-	RealTimeClock* rtc;
+	RealTimeClock rtc;
 	CapacitiveTouch* touch;
 	AxisSensor axis;
 };
@@ -55,7 +55,7 @@ void onRtc(RealTimeClock& rtc)
 {
 	// TODO: emit EVENT_CLOCK
 	debug_d("Got RTC alarm.");
-	watch.rtc->resetAlarm();
+	rtc.resetAlarm();
 }
 
 void onTouch(CapacitiveTouch& touch)
@@ -93,12 +93,6 @@ void loop()
 
 	isReady = false;
 
-	// Real Time Clock
-	if(watchState.rtcIrq) {
-		onRtc(*watch.rtc);
-		watchState.rtcIrq = false;
-	}
-
 	// Touch sensor
 	if(watch.touch && watchState.touchIrq) {
 		onTouch(*watch.touch);
@@ -116,19 +110,17 @@ void initHardware()
 		return;
 	}
 
-	watch.rtc = initRtc(watchState);
-	if(!watch.rtc) {
-		debug_e("ERROR: Unable to initialize Real Time Clock.");
+	if(!watch.rtc.begin(onRtc)) {
 		return;
 	}
 
 	// TEST RTC alarms
-	watch.rtc->disableAlarm();
+	watch.rtc.disableAlarm();
 
-	watch.rtc->setDateTime(2021, 10, 26, 19, 20, 00);
-	watch.rtc->setAlarmByMinutes(21);
+	watch.rtc.setDateTime(2021, 10, 26, 19, 20, 00);
+	watch.rtc.setAlarmByMinutes(21);
 
-	watch.rtc->enableAlarm();
+	watch.rtc.enableAlarm();
 
 	watch.touch = initTouch(watchState);
 	watch.axis.begin(onAxis);

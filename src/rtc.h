@@ -4,9 +4,16 @@
 #include <Delegate.h>
 #include "watch.h"
 
-using RealTimeClock = PCF8563_Class;
-using RealTimeClockCallback = Delegate<void(RealTimeClock&)>;
+class RealTimeClock : public PCF8563_Class
+{
+public:
+	using Callback = Delegate<void(RealTimeClock&)>;
 
-RealTimeClock* initRtc(WatchState& watchState);
+	bool begin(Callback callback);
 
-RealTimeClock& getRtc();
+private:
+	static void interruptHandler();
+
+	static RealTimeClock* clock;
+	static Callback callback;
+};

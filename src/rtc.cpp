@@ -1,35 +1,34 @@
 #include "rtc.h"
 #include <Wire.h>
 
-namespace
-{
-RealTimeClock* rtc = nullptr;
+RealTimeClock* RealTimeClock::clock;
+RealTimeClock::Callback RealTimeClock::callback;
 
-} // namespace
-
-RealTimeClock* initRtc(WatchState& watchState)
+bool RealTimeClock ::begin(Callback callback)
 {
-	if(rtc != nullptr) {
-		return rtc;
+	if(clock != nullptr) {
+		return false;
 	}
 
-	rtc = new RealTimeClock();
-	if(!rtc->begin()) {
-		debug_e("Failed initializing the real time clock!");
-		delete rtc;
-		rtc = nullptr;
+	if(!PCF8563_Class::begin()) {
+		debug_e("[RTC] Init failed");
+		return false;
 	}
+
+	clock = this;
+	this->callback = callback;
 
 	pinMode(RTC_INT_PIN, INPUT_PULLUP);
-	attachInterrupt(
-		RTC_INT_PIN, [&watchState] { watchState.rtcIrq = true; }, FALLING);
+	attachInterrupt(RTC_INT_PIN, interruptHandler, FALLING);
 
-	rtc->disableAlarm();
+	disableAlarm();
 
-	return rtc;
+	return true;
 }
 
-RealTimeClock& getRtc()
+void IRAM_ATTR RealTimeClock::interruptHandler()
 {
-	return *rtc;
+	if(callback != nullptr) {
+		System.queueCallback(InterruptCallback([]() { callback(*clock); }));
+	}
 }
