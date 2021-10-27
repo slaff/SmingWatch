@@ -94,6 +94,14 @@ void loop()
 
 	isReady = false;
 
+	// TODO: get accelerometer XYZ coordinates and store it in watch state
+
+	// TODO: get touch coordinates and store it in watch state
+
+	// TODO: Run JSVM loop
+
+	// TODO: Run GUI loop
+
 	isReady = true;
 }
 
