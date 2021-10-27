@@ -1,35 +1,21 @@
 #include "rtc.h"
+#include "config.h"
 #include <Wire.h>
 
-namespace
+bool RealTimeClock ::begin(Callback callback)
 {
-RealTimeClock* rtc = nullptr;
-
-} // namespace
-
-RealTimeClock* initRtc(WatchState& watchState)
-{
-	if(rtc != nullptr) {
-		return rtc;
+	if(class_ != nullptr) {
+		return false;
 	}
 
-	rtc = new RealTimeClock();
-	if(!rtc->begin()) {
-		debug_e("Failed initializing the real time clock!");
-		delete rtc;
-		rtc = nullptr;
+	if(!PCF8563_Class::begin()) {
+		debug_e("[RTC] Init failed");
+		return false;
 	}
 
-	pinMode(RTC_INT_PIN, INPUT_PULLUP);
-	attachInterrupt(
-		RTC_INT_PIN, [&watchState] { watchState.rtcIrq = true; }, FALLING);
+	disableAlarm();
 
-	rtc->disableAlarm();
+	attachInterrupt(callback, RTC_INT_PIN);
 
-	return rtc;
-}
-
-RealTimeClock& getRtc()
-{
-	return *rtc;
+	return true;
 }

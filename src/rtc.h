@@ -1,12 +1,11 @@
 #pragma once
 
+#include "Device.h"
 #include <pcf8563.h>
-#include <Delegate.h>
 #include "watch.h"
 
-using RealTimeClock = PCF8563_Class;
-using RealTimeClockCallback = Delegate<void(RealTimeClock&)>;
-
-RealTimeClock* initRtc(WatchState& watchState);
-
-RealTimeClock& getRtc();
+class RealTimeClock : public Device<RealTimeClock>, public PCF8563_Class
+{
+public:
+	bool begin(Callback callback);
+};

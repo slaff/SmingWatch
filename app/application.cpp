@@ -1,11 +1,12 @@
 #include <SmingCore.h>
-#include "watch.h"
-#include "power.h"
-#include "rtc.h"
-#include "axis.h"
-#include "touch.h"
-#include "display.h"
-#include "gui.h"
+#include <watch.h>
+#include <power.h>
+#include <rtc.h>
+#include <axis.h>
+#include <touch.h>
+#include <display.h>
+#include <backlight.h>
+#include <gui.h>
 
 namespace
 {
@@ -13,11 +14,14 @@ Timer mainTimer;
 bool isReady = true;
 WatchState watchState;
 
-struct Watch {
-	Power* power;
-	RealTimeClock* rtc;
-	CapacitiveTouch* touch;
-	AxisSensor* axis;
+class Watch
+{
+public:
+	Power power;
+	RealTimeClock rtc;
+	CapacitiveTouch touch;
+	AxisSensor axis;
+	BackLight backlight;
 };
 
 Watch watch;
@@ -51,14 +55,19 @@ void onPower(Power& power)
 
 void onRtc(RealTimeClock& rtc)
 {
+	// TODO: emit EVENT_CLOCK
+	debug_d("Got RTC alarm.");
+	rtc.resetAlarm();
 }
 
 void onTouch(CapacitiveTouch& touch)
 {
 	debug_d("Touched!");
-	digitalWrite(BACKLIGHT_PIN, watchState.backLight);
-	watchState.backLight = !watchState.backLight;
+	watch.backlight.reverse();
 
+	touch.getPoint(watchState.touchX, watchState.touchY);
+
+	debug_d("X: %d, Y: %d", watchState.touchX, watchState.touchY);
 	// TODO: emit EVENT_BACKLIGHT
 }
 
@@ -85,51 +94,41 @@ void loop()
 
 	isReady = false;
 
-	// Power
-	if(watchState.powerIrq) {
-		onPower(*watch.power);
-		watchState.powerIrq = false;
-	}
+	// TODO: get accelerometer XYZ coordinates and store it in watch state
 
-	// Real Time Clock
-	if(watchState.rtcIrq) {
-		onRtc(*watch.rtc);
-		watchState.rtcIrq = false;
-	}
+	// TODO: get touch coordinates and store it in watch state
 
-	// Monitoring Axis/Acceleromater Sensor
-	if(watch.axis && watchState.axisIrq) {
-		onAxis(*watch.axis);
-		watchState.axisIrq = false;
-	}
+	// TODO: Run JSVM loop
 
-	// Touch sensor
-	if(watch.touch && watchState.touchIrq) {
-		onTouch(*watch.touch);
-		watchState.touchIrq = false;
-	}
+	// TODO: Run GUI loop
 
 	isReady = true;
 }
 
 void initHardware()
 {
-	Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN); // this is the main I2S bus
+	Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN); // this is the main I2C bus
 
-	watch.power = initPower(watchState);
-	if(!watch.power) {
-		debug_e("ERROR: Unable to initialize power system.");
+	if(!watch.power.begin(onPower)) {
 		return;
 	}
 
-	watch.rtc = initRtc(watchState);
-	if(!watch.rtc) {
-		debug_e("ERROR: Unable to initialize Real Time Clock.");
+	if(!watch.rtc.begin(onRtc)) {
 		return;
 	}
 
-	watch.touch = initTouch(watchState);
-	watch.axis = initAxis(watchState);
+	// TEST RTC alarms
+	watch.rtc.disableAlarm();
+
+	watch.rtc.setDateTime(2021, 10, 26, 19, 20, 00);
+	watch.rtc.setAlarmByMinutes(21);
+
+	watch.rtc.enableAlarm();
+
+	watch.touch.begin(onTouch);
+	watch.axis.begin(onAxis);
+	watch.backlight.begin();
+	watch.backlight.adjust(10);
 
 	initDisplay([](Graphics::AbstractDisplay& display) { initGui(display, onGuiReady); });
 

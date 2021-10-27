@@ -1,12 +1,13 @@
 #pragma once
 
+#include "Device.h"
 #include <focaltech.h>
-#include <Delegate.h>
-#include "watch.h"
 
-using CapacitiveTouch = FocalTech_Class;
-using TouchInterruptHandler = Delegate<void(CapacitiveTouch&)>;
+class CapacitiveTouch : public Device<CapacitiveTouch>, public FocalTech_Class
+{
+public:
+	bool begin(Callback callback);
 
-CapacitiveTouch* initTouch(WatchState& watchState);
-
-CapacitiveTouch& getTouch();
+private:
+	static TwoWire Wire1;
+};

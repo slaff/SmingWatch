@@ -21,7 +21,6 @@ HSPI::SpiPins spiPins = {
 constexpr uint8_t TFT_CS{5};
 constexpr uint8_t TFT_RESET_PIN{Graphics::PIN_NONE};
 constexpr uint8_t TFT_DC_PIN{27};
-constexpr uint8_t TFT_BL_PIN{12};
 constexpr uint8_t TOUCH_CS_PIN{Graphics::PIN_NONE};
 
 HSPI::Controller spi(spiBus, spiPins);
@@ -56,12 +55,6 @@ bool initDisplay(DisplayCallback onDisplay)
 	 */
 	if(!tft.begin(TFT_PINSET, TFT_CS, TFT_DC_PIN, TFT_RESET_PIN, 40000000)) {
 		return false;
-	}
-
-	// Backlight
-	if(TFT_BL_PIN != Graphics::PIN_NONE) {
-		pinMode(TFT_BL_PIN, OUTPUT);
-		digitalWrite(TFT_BL_PIN, HIGH);
 	}
 
 	onDisplay(tft);
