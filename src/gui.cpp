@@ -7,7 +7,7 @@ using namespace Graphics;
 
 namespace
 {
-RenderQueue* renderQueue;
+RenderQueue renderQueue(display);
 
 constexpr Orientation portrait{Orientation::deg180};
 constexpr Orientation landscape{Orientation::deg270};
@@ -47,11 +47,7 @@ void render(Graphics::AbstractDisplay& display, RenderQueue::Completed callback)
 	}
 	text.commit(*scene);
 
-	if(renderQueue == nullptr) {
-		renderQueue = new RenderQueue(display);
-	}
-
-	renderQueue->render(scene, callback);
+	renderQueue.render(scene, callback);
 }
 
 } // namespace

@@ -7,4 +7,4 @@ using DisplayCallback = Delegate<void(Graphics::AbstractDisplay&)>;
 
 bool initDisplay(DisplayCallback onDisplay);
 
-Graphics::AbstractDisplay* getDisplay();
+extern Graphics::AbstractDisplay& display;

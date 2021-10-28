@@ -29,6 +29,8 @@ Graphics::Display::ST7789V tft(spi, {240, 240});
 
 } // namespace
 
+Graphics::AbstractDisplay& display{tft};
+
 bool initDisplay(DisplayCallback onDisplay)
 {
 #ifdef ENABLE_VIRTUAL_SCREEN
@@ -61,9 +63,4 @@ bool initDisplay(DisplayCallback onDisplay)
 
 	return true;
 #endif
-}
-
-Graphics::AbstractDisplay* getDisplay()
-{
-	return &tft;
 }
