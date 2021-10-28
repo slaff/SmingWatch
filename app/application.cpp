@@ -75,6 +75,8 @@ void onAxis(AxisSensor& axis)
 {
 	Accel acc;
 
+	axis.getINT();
+
 	// Get acceleration data
 	bool res = axis.getAccel(acc);
 	if(!res) {
