@@ -57,6 +57,12 @@ void onPower(Power& power)
 	if(power.isPEKShortPressIRQ()) {
 		// TODO: emit EVENT_POWER_SHORTPRESS
 		CONSOLE_DBG("PowerKey Pressed");
+		if(console.isPaused()) {
+			console.pause(false);
+		} else {
+			console.print(">> PAUSE <<\r");
+			console.pause(true);
+		}
 	}
 	power.clearIRQ();
 }
