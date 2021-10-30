@@ -1,30 +1,54 @@
 #include "gui.h"
-#include "display.h"
 #include <Graphics/RenderQueue.h>
 #include <Graphics/TextBuilder.h>
+
+#ifdef ENABLE_VIRTUAL_SCREEN
+#include <Graphics/Display/Virtual.h>
+#else
+#include <Graphics/Display/ST7789V.h>
+#endif
 
 using namespace Graphics;
 
 namespace
 {
-RenderQueue renderQueue(display);
+Graphics::Size guiSize{240, 240};
+
+#ifdef ENABLE_VIRTUAL_SCREEN
+Graphics::Display::Virtual tft;
+#else
+constexpr HSPI::SpiBus spiBus{HSPI::SpiBus::DEFAULT};
+constexpr HSPI::PinSet TFT_PINSET{HSPI::PinSet::normal};
+HSPI::SpiPins spiPins = {
+	.sck = 18,
+	.miso = HSPI::SPI_PIN_NONE,
+	.mosi = 19,
+};
+constexpr uint8_t TFT_CS{5};
+constexpr uint8_t TFT_RESET_PIN{Graphics::PIN_NONE};
+constexpr uint8_t TFT_DC_PIN{27};
+
+HSPI::Controller spi(spiBus, spiPins);
+Graphics::Display::ST7789V tft(spi, guiSize);
+#endif
+
+RenderQueue renderQueue(tft);
 
 constexpr Orientation portrait{Orientation::deg180};
 constexpr Orientation landscape{Orientation::deg270};
 
-void render(Graphics::AbstractDisplay& display, RenderQueue::Completed callback)
+void drawTestCard(RenderQueue::Completed callback)
 {
-	display.setOrientation(portrait);
+	tft.setOrientation(portrait);
 
-	auto size = display.getSize();
-	auto scene = new SceneObject(size, F("Color Tests"));
+	auto scene = new SceneObject(guiSize, F("Color Tests"));
 	scene->clear();
 
 	Color color[] = {Color::RED, Color::GREEN, Color::BLUE, Color::WHITE};
 	uint8_t numColors = ARRAY_SIZE(color);
 
-	auto height = size.h / 4;
-	auto width = size.w / numColors;
+	auto height = guiSize.h / 4;
+	auto width = guiSize.w / numColors;
 
 	TextBuilder text(*scene);
 	text.setColor(Color::White, Color::Black);
@@ -52,7 +76,25 @@ void render(Graphics::AbstractDisplay& display, RenderQueue::Completed callback)
 
 } // namespace
 
-void initGui(Graphics::AbstractDisplay& display, RenderQueue::Completed callback)
+bool Gui::begin(Gui::Callback callback)
 {
-	render(display, callback);
+#ifdef ENABLE_VIRTUAL_SCREEN
+	if(!tft.begin(guiSize.w, guiSize.h)) {
+		return false;
+	}
+	// tft.setMode(Display::Virtual::Mode::Debug);
+#else
+	if(!spi.begin()) {
+		return false;
+	}
+
+	if(!tft.begin(TFT_PINSET, TFT_CS, TFT_DC_PIN, TFT_RESET_PIN, 40000000)) {
+		return false;
+	}
+
+#endif
+
+	drawTestCard([this, callback](Object*) { callback(*this); });
+
+	return true;
 }
