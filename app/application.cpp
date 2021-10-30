@@ -13,6 +13,10 @@ Timer mainTimer;
 bool isReady = true;
 WatchState watchState;
 
+// #define console Serial
+
+#define CONSOLE_DBG(fmt, ...) console.printf(_F("%u " fmt "\r\n"), system_get_time(), ##__VA_ARGS__)
+
 class Watch
 {
 public:
@@ -31,6 +35,7 @@ void onGuiReady(Gui& gui)
 	// TODO: add here the rest...
 
 	console.println("OK, GUI is ready.");
+	// console.systemDebugOutput(true);
 	debug_i("OK, GUI is ready.");
 }
 
@@ -43,15 +48,15 @@ void onPower(Power& power)
 
 	if(power.isVbusPlugInIRQ()) {
 		// TODO: emit EVENT_POWER_PLUGGEDIN
-		Serial.println("Power Connected");
+		CONSOLE_DBG("Power Connected");
 	}
 	if(power.isVbusRemoveIRQ()) {
 		// TODO: emit EVENT_POWER_UNPLUGGED
-		Serial.println("Power Removed");
+		CONSOLE_DBG("Power Removed");
 	}
 	if(power.isPEKShortPressIRQ()) {
 		// TODO: emit EVENT_POWER_SHORTPRESS
-		Serial.println("PowerKey Pressed");
+		CONSOLE_DBG("PowerKey Pressed");
 	}
 	power.clearIRQ();
 }
@@ -59,7 +64,7 @@ void onPower(Power& power)
 void onRtc(RealTimeClock& rtc)
 {
 	// TODO: emit EVENT_CLOCK
-	debug_d("Got RTC alarm.");
+	CONSOLE_DBG("Got RTC alarm.");
 	rtc.resetAlarm();
 }
 
@@ -68,7 +73,7 @@ void onTouch(CapacitiveTouch& touch)
 	// TODO: emit EVENT_BACKLIGHT
 
 	touch.getPoint(watchState.touchX, watchState.touchY);
-	debug_d("Touched: X %u, Y %u", watchState.touchX, watchState.touchY);
+	CONSOLE_DBG("Touched: X %u, Y %u", watchState.touchX, watchState.touchY);
 
 	watch.backlight.reverse();
 }
@@ -85,7 +90,7 @@ void onAxis(AxisSensor& axis)
 		return;
 	}
 
-	debug_d("Axis: X %d, Y %d, Z %d", acc.x, acc.y, acc.z);
+	CONSOLE_DBG("Axis: X %d, Y %d, Z %d", acc.x, acc.y, acc.z);
 
 	// TODO: emit EVENT_ACCEL_COORD
 }

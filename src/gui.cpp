@@ -76,6 +76,8 @@ void drawTestCard(RenderQueue::Completed callback)
 
 } // namespace
 
+Graphics::Console console(tft, renderQueue);
+
 bool Gui::begin(Gui::Callback callback)
 {
 #ifdef ENABLE_VIRTUAL_SCREEN

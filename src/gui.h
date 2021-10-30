@@ -1,7 +1,8 @@
 #pragma once
 
-#include <Graphics/RenderQueue.h>
-#include <Graphics/AbstractDisplay.h>
+#include <Graphics/Console.h>
+
+extern Graphics::Console console;
 
 class Gui
 {
