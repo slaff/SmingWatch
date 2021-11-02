@@ -1,6 +1,13 @@
 #pragma once
 
-#include <Graphics/RenderQueue.h>
-#include <Graphics/AbstractDisplay.h>
+#include <Graphics/Console.h>
 
-void initGui(Graphics::AbstractDisplay& display, Graphics::RenderQueue::Completed callback);
+extern Graphics::Console console;
+
+class Gui
+{
+public:
+	using Callback = Delegate<void(Gui& gui)>;
+
+	bool begin(Callback callback);
+};

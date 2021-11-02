@@ -1,6 +1,13 @@
 #include "pwmbase.h"
 #include "driver/ledc.h"
 #include <Digital.h>
+#include <driver/ledc.h>
+
+namespace
+{
+constexpr ledc_mode_t mode{LEDC_LOW_SPEED_MODE};
+constexpr ledc_timer_t timerNum{LEDC_TIMER_0};
+} // namespace
 
 PWMBase::~PWMBase()
 {

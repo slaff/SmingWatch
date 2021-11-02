@@ -4,7 +4,6 @@
 #include <rtc.h>
 #include <axis.h>
 #include <touch.h>
-#include <display.h>
 #include <backlight.h>
 #include <gui.h>
 
@@ -14,6 +13,10 @@ Timer mainTimer;
 bool isReady = true;
 WatchState watchState;
 
+// #define console Serial
+
+#define CONSOLE_DBG(fmt, ...) console.printf(_F("%u " fmt "\r\n"), system_get_time(), ##__VA_ARGS__)
+
 class Watch
 {
 public:
@@ -22,13 +25,18 @@ public:
 	CapacitiveTouch touch;
 	AxisSensor axis;
 	BackLight backlight;
+	Gui gui;
 };
 
 Watch watch;
 
-void onGuiReady(Graphics::Object* object)
+void onGuiReady(Gui& gui)
 {
 	// TODO: add here the rest...
+
+	console.println("OK, GUI is ready.");
+	// console.systemDebugOutput(true);
+	debug_i("OK, GUI is ready.");
 }
 
 void onPower(Power& power)
@@ -40,15 +48,21 @@ void onPower(Power& power)
 
 	if(power.isVbusPlugInIRQ()) {
 		// TODO: emit EVENT_POWER_PLUGGEDIN
-		Serial.println("Power Plug In");
+		CONSOLE_DBG("Power Connected");
 	}
 	if(power.isVbusRemoveIRQ()) {
 		// TODO: emit EVENT_POWER_UNPLUGGED
-		Serial.println("Power Remove");
+		CONSOLE_DBG("Power Removed");
 	}
 	if(power.isPEKShortPressIRQ()) {
 		// TODO: emit EVENT_POWER_SHORTPRESS
-		Serial.println("PowerKey Pressed");
+		CONSOLE_DBG("PowerKey Pressed");
+		if(console.isPaused()) {
+			console.pause(false);
+		} else {
+			console.print(">> PAUSE <<\r");
+			console.pause(true);
+		}
 	}
 	power.clearIRQ();
 }
@@ -56,33 +70,34 @@ void onPower(Power& power)
 void onRtc(RealTimeClock& rtc)
 {
 	// TODO: emit EVENT_CLOCK
-	debug_d("Got RTC alarm.");
+	CONSOLE_DBG("Got RTC alarm.");
 	rtc.resetAlarm();
 }
 
 void onTouch(CapacitiveTouch& touch)
 {
-	debug_d("Touched!");
-	watch.backlight.reverse();
+	// TODO: emit EVENT_BACKLIGHT
 
 	touch.getPoint(watchState.touchX, watchState.touchY);
+	CONSOLE_DBG("Touched: X %u, Y %u", watchState.touchX, watchState.touchY);
 
-	debug_d("X: %d, Y: %d", watchState.touchX, watchState.touchY);
-	// TODO: emit EVENT_BACKLIGHT
+	watch.backlight.reverse();
 }
 
 void onAxis(AxisSensor& axis)
 {
-	Accel acc;
+	axis.getINT();
 
 	// Get acceleration data
+	Accel acc;
 	bool res = axis.getAccel(acc);
 	if(!res) {
 		debug_e("FAILED: getAccel");
 		return;
 	}
 
-	Serial.printf("X: %d, Y: %d, Z: %d\n", acc.x, acc.y, acc.z);
+	CONSOLE_DBG("Axis: X %d, Y %d, Z %d", acc.x, acc.y, acc.z);
+
 	// TODO: emit EVENT_ACCEL_COORD
 }
 
@@ -109,28 +124,24 @@ void initHardware()
 {
 	Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN); // this is the main I2C bus
 
-	if(!watch.power.begin(onPower)) {
-		return;
+	watch.power.begin(onPower);
+
+	if(watch.rtc.begin(onRtc)) {
+		// TEST RTC alarms
+		watch.rtc.disableAlarm();
+
+		watch.rtc.setDateTime(2021, 10, 26, 19, 20, 00);
+		watch.rtc.setAlarmByMinutes(21);
+
+		watch.rtc.enableAlarm();
 	}
-
-	if(!watch.rtc.begin(onRtc)) {
-		return;
-	}
-
-	// TEST RTC alarms
-	watch.rtc.disableAlarm();
-
-	watch.rtc.setDateTime(2021, 10, 26, 19, 20, 00);
-	watch.rtc.setAlarmByMinutes(21);
-
-	watch.rtc.enableAlarm();
 
 	watch.touch.begin(onTouch);
 	watch.axis.begin(onAxis);
 	watch.backlight.begin();
 	watch.backlight.adjust(10);
 
-	initDisplay([](Graphics::AbstractDisplay& display) { initGui(display, onGuiReady); });
+	watch.gui.begin(onGuiReady);
 
 	mainTimer.initializeMs(10, loop).start();
 
