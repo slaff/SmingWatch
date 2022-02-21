@@ -100,3 +100,8 @@ bool Gui::begin(Gui::Callback callback)
 
 	return true;
 }
+
+Graphics::AbstractDisplay& Gui::getDisplay()
+{
+	return tft;
+}

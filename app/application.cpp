@@ -6,12 +6,16 @@
 #include <touch.h>
 #include <backlight.h>
 #include <gui.h>
+#include <AnimatedGifTask.h>
 
 namespace
 {
 Timer mainTimer;
 bool isReady = true;
 WatchState watchState;
+AnimatedGifTask* animation;
+
+IMPORT_FSTR(gifData, PROJECT_DIR "/files/frog.gif")
 
 // #define console Serial
 
@@ -72,6 +76,12 @@ void onRtc(RealTimeClock& rtc)
 	// TODO: emit EVENT_CLOCK
 	CONSOLE_DBG("Got RTC alarm.");
 	rtc.resetAlarm();
+
+	if(animation == nullptr) {
+		animation = new AnimatedGifTask(*watch.gui.getDisplay().createSurface(), gifData);
+	}
+
+	animation->resume();
 }
 
 void onTouch(CapacitiveTouch& touch)
@@ -82,6 +92,17 @@ void onTouch(CapacitiveTouch& touch)
 	CONSOLE_DBG("Touched: X %u, Y %u", watchState.touchX, watchState.touchY);
 
 	watch.backlight.reverse();
+
+	if(animation == nullptr) {
+		return;
+	}
+
+	if(watch.backlight.isOn()) {
+		animation->resume();
+	}
+	else {
+		animation->suspend();
+	}
 }
 
 void onAxis(AxisSensor& axis)
