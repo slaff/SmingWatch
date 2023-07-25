@@ -7,6 +7,7 @@
 #include <backlight.h>
 #include <gui.h>
 #include <AnimatedGifTask.h>
+#include <MillisTaskManager.h>
 
 namespace
 {
@@ -14,6 +15,7 @@ Timer mainTimer;
 bool isReady = true;
 WatchState watchState;
 AnimatedGifTask* animation;
+static MillisTaskManager taskManager;
 
 IMPORT_FSTR(gifData, PROJECT_DIR "/files/frog.gif")
 
@@ -122,23 +124,27 @@ void onAxis(AxisSensor& axis)
 	// TODO: emit EVENT_ACCEL_COORD
 }
 
+
+void buttonUpdate()
+{
+}
+
+void displayUpdate()
+{
+}
+
+void powerAutoShutdownUpdate()
+{
+}
+
+void cpuUsageUpdate()
+{
+}
+
+
 void loop()
 {
-	if(!isReady) {
-		return;
-	}
-
-	isReady = false;
-
-	// TODO: get accelerometer XYZ coordinates and store it in watch state
-
-	// TODO: get touch coordinates and store it in watch state
-
-	// TODO: Run JSVM loop
-
-	// TODO: Run GUI loop
-
-	isReady = true;
+	taskManager.Running(millis());
 }
 
 void initHardware()
@@ -164,7 +170,13 @@ void initHardware()
 
 	watch.gui.begin(onGuiReady);
 
-	mainTimer.initializeMs(10, loop).start();
+	taskManager.Register(displayUpdate, 1);
+	taskManager.Register(buttonUpdate, 10);
+	taskManager.Register(powerAutoShutdownUpdate, 100);
+	taskManager.Register(cpuUsageUpdate, 1000);
+
+
+	mainTimer.initializeMs(1, loop).start();
 
 	// TODO: emit EVENT_READY
 }
