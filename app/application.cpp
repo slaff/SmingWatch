@@ -15,7 +15,6 @@ Timer mainTimer;
 bool isReady = true;
 WatchState watchState;
 AnimatedGifTask* animation;
-static MillisTaskManager taskManager;
 
 IMPORT_FSTR(gifData, PROJECT_DIR "/files/frog.gif")
 
@@ -32,6 +31,7 @@ public:
 	AxisSensor axis;
 	BackLight backlight;
 	Gui gui;
+	MillisTaskManager taskManager;
 };
 
 Watch watch;
@@ -101,8 +101,7 @@ void onTouch(CapacitiveTouch& touch)
 
 	if(watch.backlight.isOn()) {
 		animation->resume();
-	}
-	else {
+	} else {
 		animation->suspend();
 	}
 }
@@ -124,7 +123,6 @@ void onAxis(AxisSensor& axis)
 	// TODO: emit EVENT_ACCEL_COORD
 }
 
-
 void buttonUpdate()
 {
 }
@@ -141,10 +139,9 @@ void cpuUsageUpdate()
 {
 }
 
-
 void loop()
 {
-	taskManager.Running(millis());
+	watch.taskManager.running(millis());
 }
 
 void initHardware()
@@ -170,11 +167,10 @@ void initHardware()
 
 	watch.gui.begin(onGuiReady);
 
-	taskManager.Register(displayUpdate, 1);
-	taskManager.Register(buttonUpdate, 10);
-	taskManager.Register(powerAutoShutdownUpdate, 100);
-	taskManager.Register(cpuUsageUpdate, 1000);
-
+	watch.taskManager.add(displayUpdate, 1);
+	watch.taskManager.add(buttonUpdate, 10);
+	watch.taskManager.add(powerAutoShutdownUpdate, 100);
+	watch.taskManager.add(cpuUsageUpdate, 1000);
 
 	mainTimer.initializeMs(1, loop).start();
 
