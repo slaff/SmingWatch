@@ -183,6 +183,10 @@ void init()
 {
 	Serial.begin(SERIAL_BAUD_RATE); // 115200 by default
 	Serial.systemDebugOutput(true); // Allow debug output to serial
+	Serial.println("Starting ...");
+
+	// setup event manager
+	watch.eventManager = new Watch::EventManagerType(watch);
 
 	initHardware();
 }
