@@ -45,14 +45,22 @@ public:
 
 		Event* head = channels[type];
 		// If the list is empty or the new node has higher priority than the head
-		if(head == nullptr || priority > head->priority) {
+		if(head == nullptr || priority >= head->priority) {
 			event->next = head;
+			head = event;
 			channels[type] = event;
 		} else {
 			Event* current = head;
 
 			// Find the position to insert the new node
 			while(current->next != nullptr && priority <= current->next->priority) {
+				// Insert before elements with the same priority
+				if(priority == current->next->priority) {
+					event->next = current->next;
+					current->next = event;
+					return true; // Stop further traversal
+				}
+
 				current = current->next;
 			}
 
