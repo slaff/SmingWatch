@@ -7,7 +7,7 @@
 template <typename T, class S, typename V> class EventManager
 {
 public:
-	using EventFunction = Delegate<bool(V value, S&)>;
+	using EventFunction = Delegate<bool(const V& value, S&)>;
 	struct Event {
 		bool active;
 		EventFunction function;
@@ -72,7 +72,7 @@ public:
 		return true;
 	}
 
-	void trigger(T type, V value)
+	void trigger(T type, const V& value = V{})
 	{
 		Event* head = channels[type];
 		if(head == nullptr) {

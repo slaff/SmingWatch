@@ -1,8 +1,9 @@
 #include "rtc.h"
 #include "config.h"
 #include <Wire.h>
+#include "watch.h"
 
-bool RealTimeClock ::begin(Callback callback)
+bool RealTimeClock::begin(Watch& watch, Callback callback)
 {
 	if(class_ != nullptr) {
 		return false;

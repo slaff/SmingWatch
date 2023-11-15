@@ -5,12 +5,16 @@
 
 extern Graphics::Console console;
 
+class Watch;
+
 class Gui
 {
 public:
 	using Callback = Delegate<void(Gui& gui)>;
 
-	bool begin(Callback callback);
+	bool begin(Watch& watch, Callback callback = nullptr);
+
+	void update(Watch& watch, Callback callback = nullptr);
 
 	Graphics::AbstractDisplay& getDisplay();
 };

@@ -1,4 +1,5 @@
 #include "gui.h"
+#include "watch.h"
 #include <Graphics/RenderQueue.h>
 #include <Graphics/TextBuilder.h>
 
@@ -37,6 +38,7 @@ RenderQueue renderQueue(tft);
 constexpr Orientation portrait{Orientation::deg180};
 constexpr Orientation landscape{Orientation::deg270};
 
+#if 0
 void drawTestCard(RenderQueue::Completed callback)
 {
 	tft.setOrientation(portrait);
@@ -73,12 +75,40 @@ void drawTestCard(RenderQueue::Completed callback)
 
 	renderQueue.render(scene, callback);
 }
+#endif
+
+void drawTime(Watch& watch, RenderQueue::Completed callback = nullptr)
+{
+	tft.setOrientation(portrait);
+
+	auto scene = new SceneObject(guiSize, F("Time"));
+	scene->clear();
+
+	Color color[] = {Color::RED, Color::GREEN, Color::BLUE, Color::WHITE};
+	uint8_t numColors = ARRAY_SIZE(color);
+
+	auto height = guiSize.h / 4;
+	auto width = guiSize.w / numColors;
+
+	TextBuilder text(*scene);
+
+	text.setColor(Color::White, Color::Black);
+	text.setScale(5);
+	text.setTextAlign(Align::Centre);
+	text.setLineAlign(Align::Centre);
+
+	auto today = watch.rtc.getDateTime();
+	text.printf("%02d:%02d", today.hour, today.minute);
+	text.commit(*scene);
+
+	renderQueue.render(scene, callback);
+}
 
 } // namespace
 
 Graphics::Console console(tft, renderQueue);
 
-bool Gui::begin(Gui::Callback callback)
+bool Gui::begin(Watch& watch, Gui::Callback callback)
 {
 #ifdef ENABLE_VIRTUAL_SCREEN
 	if(!tft.begin(guiSize.w, guiSize.h)) {
@@ -96,9 +126,19 @@ bool Gui::begin(Gui::Callback callback)
 
 #endif
 
-	drawTestCard([this, callback](Object*) { callback(*this); });
+	update(watch, callback);
 
 	return true;
+}
+
+void Gui::update(Watch& watch, Gui::Callback callback)
+{
+	if(callback) {
+		drawTime(watch, [this, callback](Object*) { callback(*this); });
+		return;
+	}
+
+	drawTime(watch, [](Object*) {});
 }
 
 Graphics::AbstractDisplay& Gui::getDisplay()
