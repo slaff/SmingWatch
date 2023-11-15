@@ -38,20 +38,20 @@ public:
 
 	// Battery Event
 	struct BatteryEvent {
-	    int batteryLevel;
+		int batteryLevel;
 	};
 
 	// Highlight Event
 	struct BacklightEvent {
-	    uint8_t lightPercentage;
+		uint8_t lightPercentage;
 	};
 
 	// Union Type
 	union EventData {
 		BoolEvent onOff;
-	    MotionEvent motion;
-	    BatteryEvent battery;
-	    BacklightEvent backlight;
+		MotionEvent motion;
+		BatteryEvent battery;
+		BacklightEvent backlight;
 	};
 
 	using EventManagerType = EventManager<EventTypes, Watch, EventData>;

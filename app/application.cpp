@@ -39,19 +39,11 @@ void onPower(Power& power)
 	}
 
 	if(power.isVbusPlugInIRQ()) {
-		watch.getEventManager().trigger(Watch::EventTypes::POWER_PLUGGED, Watch::EventData{
-			.onOff = {
-					.on = true
-			}
-		});
+		watch.getEventManager().trigger(Watch::EventTypes::POWER_PLUGGED, {.onOff = {true}});
 		CONSOLE_DBG("Power Connected");
 	}
 	if(power.isVbusRemoveIRQ()) {
-		watch.getEventManager().trigger(Watch::EventTypes::POWER_PLUGGED, Watch::EventData{
-			.onOff = {
-					.on = false
-			}
-		});
+		watch.getEventManager().trigger(Watch::EventTypes::POWER_PLUGGED, {.onOff = {false}});
 		CONSOLE_DBG("Power Removed");
 	}
 	if(power.isPEKShortPressIRQ()) {
@@ -88,11 +80,7 @@ void onTouch(CapacitiveTouch& touch)
 
 	watch.backlight.reverse();
 
-	watch.getEventManager().trigger(Watch::EventTypes::BACKLIGHT, Watch::EventData{
-		.backlight = {
-				.lightPercentage = 100
-		}
-	});
+	watch.getEventManager().trigger(Watch::EventTypes::BACKLIGHT, {.backlight = {100}});
 
 	if(animation == nullptr) {
 		return;
@@ -119,13 +107,7 @@ void onAxis(AxisSensor& axis)
 
 	CONSOLE_DBG("Axis: X %d, Y %d, Z %d", acc.x, acc.y, acc.z);
 
-	watch.getEventManager().trigger(Watch::EventTypes::ACCEL_COORD, Watch::EventData{
-		.motion = {
-			.accelerationX = acc.x,
-			.accelerationY = acc.y,
-			.accelerationZ = acc.z
-		}
-	});
+	watch.getEventManager().trigger(Watch::EventTypes::ACCEL_COORD, {.motion = {acc.x, acc.y, acc.z}});
 }
 
 void buttonUpdate()
